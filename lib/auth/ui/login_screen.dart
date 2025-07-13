@@ -50,10 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Login Successful!')),
             );
-            // Redirect to main app screen
+
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                  builder: (context) => const ProductListScreen()),
+                  builder: (context) => ProductListScreen(
+                        onThemeToggle: (bool isDarkMode) {},
+                      )),
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(

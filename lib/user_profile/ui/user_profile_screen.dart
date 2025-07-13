@@ -44,7 +44,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SnackBar(
                       content: Text('Please login to view your profile.')),
                 );
-                // Navigate to login if not authenticated
+
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   AppRoutes.login,
                   (route) => false,

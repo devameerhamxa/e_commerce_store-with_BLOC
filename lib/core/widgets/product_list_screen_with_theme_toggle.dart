@@ -14,20 +14,14 @@ class ProductListScreenWithThemeToggle extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const ProductListScreen(),
+          ProductListScreen(onThemeToggle: onThemeToggle),
           Positioned(
             bottom: 20,
             right: 20,
-            child: FloatingActionButton(
-              onPressed: () {
-                final currentBrightness = Theme.of(context).brightness;
-                onThemeToggle(currentBrightness == Brightness.light);
-              },
-              child: Icon(
-                Theme.of(context).brightness == Brightness.light
-                    ? Icons.dark_mode
-                    : Icons.light_mode,
-              ),
+            child: Icon(
+              Theme.of(context).brightness == Brightness.light
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
             ),
           ),
         ],

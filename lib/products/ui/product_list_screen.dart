@@ -6,12 +6,16 @@ import 'package:e_commerce_store_with_bloc/products/bloc/product_bloc.dart';
 import 'package:e_commerce_store_with_bloc/products/bloc/product_event.dart';
 import 'package:e_commerce_store_with_bloc/products/bloc/product_state.dart';
 import 'package:e_commerce_store_with_bloc/products/data/models/product_model.dart';
-import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
-import 'package:e_commerce_store_with_bloc/auth/bloc/auth_event.dart';
+import 'package:e_commerce_store_with_bloc/cart/bloc/cart_bloc.dart';
+import 'package:e_commerce_store_with_bloc/cart/bloc/cart_state.dart';
+import 'package:e_commerce_store_with_bloc/core/widgets/app_drawer.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductListScreen extends StatefulWidget {
-  const ProductListScreen({Key? key}) : super(key: key);
+  final Function(bool) onThemeToggle;
+
+  const ProductListScreen({Key? key, required this.onThemeToggle})
+      : super(key: key);
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
@@ -54,41 +58,79 @@ class _ProductListScreenState extends State<ProductListScreen> {
       appBar: AppBar(
         title: const Text('Products'),
         centerTitle: true,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                _searchFocusNode.unfocus();
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              _searchFocusNode.unfocus();
-              Navigator.pushNamed(context, AppRoutes.cart);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              _searchFocusNode.unfocus();
-              Navigator.pushNamed(context, AppRoutes.userProfile);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              _searchFocusNode.unfocus();
-              context.read<AuthBloc>().add(AuthLogoutRequested());
-              Navigator.pushNamedAndRemoveUntil(
-                  context, AppRoutes.login, (r) => false);
+          BlocBuilder<CartBloc, CartState>(
+            builder: (context, state) {
+              int itemCount = 0;
+              if (state is CartLoaded) {
+                itemCount = state.cartItems.values
+                    .fold(0, (sum, quantity) => sum + quantity);
+              }
+              return Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: IconButton(
+                      icon: const Icon(Icons.shopping_cart),
+                      onPressed: () {
+                        _searchFocusNode.unfocus();
+                        Navigator.pushNamed(context, AppRoutes.cart);
+                      },
+                    ),
+                  ),
+                  if (itemCount > 0)
+                    Positioned(
+                      right: 12,
+                      top: 7,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '$itemCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
             },
           ),
         ],
       ),
+      drawer: AppDrawer(
+          onThemeToggle:
+              widget.onThemeToggle), // Pass the theme toggle callback
       body: Column(
         children: [
-          // ── Search Bar ───
+          // ── Search Bar ───────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
-              onChanged: _onSearchChanged,
               focusNode: _searchFocusNode,
+              onChanged: _onSearchChanged,
               decoration: InputDecoration(
                 hintText: 'Search products...',
                 prefixIcon: const Icon(Icons.search),
@@ -102,7 +144,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
             ),
           ),
 
-          // ── Category Chips ────
+          // ── Category Chips ───────────────────────────────────────
           BlocBuilder<ProductBloc, ProductState>(
             builder: (context, state) {
               if (state is ProductLoaded) {
@@ -128,7 +170,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
           // ── Product Grid ─────────────────────────────────────────
           Expanded(
             child: BlocConsumer<ProductBloc, ProductState>(
-              // Only fire for errors:
               listenWhen: (previous, current) => current is ProductError,
               listener: (context, state) {
                 if (state is ProductError && mounted) {
@@ -165,7 +206,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         return ProductCard(
                           product: product,
                           onTap: () {
-                            _searchFocusNode.unfocus();
+                            _searchFocusNode
+                                .unfocus(); // Unfocus before navigating
                             Navigator.pushNamed(
                               context,
                               AppRoutes.productDetail,
@@ -259,6 +301,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 }
 
+// ProductCard (assuming this is in a separate file like lib/products/ui/product_card.dart)
+// No changes needed here.
 class ProductCard extends StatelessWidget {
   final ProductModel product;
   final VoidCallback onTap;

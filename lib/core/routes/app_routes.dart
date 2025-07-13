@@ -33,7 +33,9 @@ class AppRoutes {
       case productList:
         // ProductListScreen uses the ProductBloc provided higher up in the widget tree (MyApp)
         return MaterialPageRoute(
-          builder: (context) => const ProductListScreen(),
+          builder: (context) => ProductListScreen(
+            onThemeToggle: (bool isDarkMode) {},
+          ),
           settings: settings,
         );
 
