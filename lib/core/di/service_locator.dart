@@ -1,6 +1,7 @@
 // lib/core/di/service_locator.dart
 import 'package:e_commerce_store_with_bloc/core/api/api_client.dart';
 import 'package:e_commerce_store_with_bloc/core/utils/secure_storage.dart';
+import 'package:e_commerce_store_with_bloc/products/bloc/product_detail_bloc/product_detail_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
@@ -42,4 +43,7 @@ void setupLocator() {
       () => CartBloc(cartRepository: getIt<CartRepository>()));
   getIt.registerFactory<UserBloc>(
       () => UserBloc(userRepository: getIt<UserRepository>()));
+
+  getIt.registerLazySingleton<ProductDetailBloc>(
+      () => ProductDetailBloc(productRepository: getIt<ProductRepository>()));
 }

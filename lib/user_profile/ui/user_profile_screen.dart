@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_event.dart';
+import 'package:e_commerce_store_with_bloc/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_store_with_bloc/user_profile/bloc/user_bloc.dart';
@@ -24,10 +25,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (authState is AuthAuthenticated) {
       BlocProvider.of<UserBloc>(context)
           .add(FetchUserDetails(authState.userId));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please login to view your profile.')),
-      );
     }
   }
 
@@ -38,93 +35,134 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         title: const Text('User Profile'),
         centerTitle: true,
       ),
-      body: BlocConsumer<UserBloc, UserState>(
-        listener: (context, state) {
-          if (state is UserError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${state.message}')),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is UserLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is UserLoaded) {
-            final user = state.user;
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.2),
-                      child: Icon(Icons.person,
-                          size: 80,
-                          color: Theme.of(context).colorScheme.primary),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is! AuthAuthenticated) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Please login to view your profile.')),
+                );
+                // Navigate to login if not authenticated
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.login,
+                  (route) => false,
+                );
+              }
+            },
+          ),
+          BlocListener<UserBloc, UserState>(
+            listener: (context, state) {
+              if (state is UserError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: ${state.message}')),
+                );
+              }
+            },
+          ),
+        ],
+        child: BlocBuilder<UserBloc, UserState>(
+          builder: (context, state) {
+            if (state is UserLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is UserLoaded) {
+              final user = state.user;
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.2),
+                        child: Icon(Icons.person,
+                            size: 80,
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildProfileInfoCard(
-                    context,
-                    'Name',
-                    '${user.name.firstname} ${user.name.lastname}',
-                    Icons.person_outline,
-                  ),
-                  _buildProfileInfoCard(
-                    context,
-                    'Username',
-                    user.username,
-                    Icons.account_circle_outlined,
-                  ),
-                  _buildProfileInfoCard(
-                    context,
-                    'Email',
-                    user.email,
-                    Icons.email_outlined,
-                  ),
-                  _buildProfileInfoCard(
-                    context,
-                    'Phone',
-                    user.phone,
-                    Icons.phone_outlined,
-                  ),
-                  _buildProfileInfoCard(
-                    context,
-                    'Address',
-                    '${user.address.number} ${user.address.street}, ${user.address.city}, ${user.address.zipcode}',
-                    Icons.location_on_outlined,
-                  ),
-                  const SizedBox(height: 30),
-                  Center(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        BlocProvider.of<AuthBloc>(context)
-                            .add(AuthLogoutRequested());
-                      },
-                      icon: const Icon(Icons.logout),
-                      label: const Text('Logout'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 20),
+                    _buildProfileInfoCard(
+                      context,
+                      'Name',
+                      '${user.name.firstname} ${user.name.lastname}',
+                      Icons.person_outline,
+                    ),
+                    _buildProfileInfoCard(
+                      context,
+                      'Username',
+                      user.username,
+                      Icons.account_circle_outlined,
+                    ),
+                    _buildProfileInfoCard(
+                      context,
+                      'Email',
+                      user.email,
+                      Icons.email_outlined,
+                    ),
+                    _buildProfileInfoCard(
+                      context,
+                      'Phone',
+                      user.phone,
+                      Icons.phone_outlined,
+                    ),
+                    _buildProfileInfoCard(
+                      context,
+                      'Address',
+                      '${user.address.number} ${user.address.street}, ${user.address.city}, ${user.address.zipcode}',
+                      Icons.location_on_outlined,
+                    ),
+                    const SizedBox(height: 30),
+                    Center(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          BlocProvider.of<AuthBloc>(context)
+                              .add(AuthLogoutRequested());
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            AppRoutes.login,
+                            (route) => false,
+                          );
+                        },
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Logout'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                     ),
+                  ],
+                ),
+              );
+            }
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.person_off_outlined,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Please login to view your profile',
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
               ),
             );
-          }
-          return const SizedBox.shrink();
-        },
+          },
+        ),
       ),
     );
   }
@@ -158,9 +196,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
-                    overflow: TextOverflow
-                        .ellipsis, // Optional: handle very long text
-                    maxLines: 2, // Optional: allow text to wrap to 2 lines
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ],
               ),

@@ -44,15 +44,6 @@ class ProductLoaded extends ProductState {
       [products, categories, selectedCategory ?? '', searchQuery];
 }
 
-class ProductDetailLoaded extends ProductState {
-  final ProductModel product;
-
-  const ProductDetailLoaded({required this.product});
-
-  @override
-  List<Object> get props => [product];
-}
-
 class ProductError extends ProductState {
   final String message;
 

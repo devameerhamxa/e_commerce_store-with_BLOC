@@ -1,11 +1,11 @@
+import 'package:e_commerce_store_with_bloc/products/bloc/product_detail_bloc/product_detail_bloc.dart';
+import 'package:e_commerce_store_with_bloc/products/bloc/product_detail_bloc/product_detail_event.dart';
+import 'package:e_commerce_store_with_bloc/products/bloc/product_detail_bloc/product_detail_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:e_commerce_store_with_bloc/products/bloc/product_bloc.dart';
-import 'package:e_commerce_store_with_bloc/products/bloc/product_event.dart';
-import 'package:e_commerce_store_with_bloc/products/bloc/product_state.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_bloc.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_event.dart';
-import 'package:e_commerce_store_with_bloc/core/widgets/custom_loading_indicator.dart';
+import 'package:e_commerce_store_with_bloc/core/widgets/custom_loading_indicator.dart'; // Ensure this import is correct
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
@@ -21,8 +21,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<ProductBloc>(context)
-        .add(FetchProductDetails(widget.productId));
+    // Dispatch the event to the NEW ProductDetailBloc
+    // Use addPostFrameCallback for safety with context.read in initState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context
+          .read<ProductDetailBloc>()
+          .add(FetchProductDetail(widget.productId));
+    });
   }
 
   @override
@@ -32,16 +37,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         title: const Text('Product Details'),
         centerTitle: true,
       ),
-      body: BlocConsumer<ProductBloc, ProductState>(
+      // Use the NEW Bloc in the listener and builder
+      body: BlocConsumer<ProductDetailBloc, ProductDetailState>(
         listener: (context, state) {
-          if (state is ProductError) {
+          if (state is ProductDetailError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error: ${state.message}')),
             );
           }
         },
         builder: (context, state) {
-          if (state is ProductLoading) {
+          if (state is ProductDetailLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ProductDetailLoaded) {
             final product = state.product;
@@ -51,16 +57,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child: CustomLoadingIndicator(
-                      isLoading: true, // Shimmer for image while loading
-                      child: Image.network(
-                        product.image,
-                        height: 250,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.broken_image, size: 100);
-                        },
-                      ),
+                    // Removed CustomLoadingIndicator shimmer here as Image.network handles its own loading.
+                    child: Image.network(
+                      product.image,
+                      height: 250,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.broken_image, size: 100);
+                      },
+                      loadingBuilder: (BuildContext context, Widget child,
+                          ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return CustomLoadingIndicator(
+                          // Use CustomLoadingIndicator for image loading shimmer
+                          isLoading: true,
+                          child: Container(
+                            height: 250,
+                            width: double.infinity,
+                            color: Colors.grey[300], // Placeholder color
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -81,7 +98,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.star, color: Colors.amber, size: 20),
+                      const Icon(Icons.star, color: Colors.amber, size: 20),
                       const SizedBox(width: 4),
                       Text(
                         '${product.rating.rate} (${product.rating.count} reviews)',
@@ -114,6 +131,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     height: 50,
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        // Assuming CartBloc is available via BlocProvider
                         BlocProvider.of<CartBloc>(context).add(
                           AddToCart(productId: product.id, quantity: 1),
                         );
@@ -136,8 +154,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             );
+          } else if (state is ProductDetailError) {
+            // Changed to ProductDetailError
+            return Center(child: Text('Error: ${state.message}'));
           }
-          return const SizedBox.shrink();
+
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );

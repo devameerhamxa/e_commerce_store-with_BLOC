@@ -1,3 +1,4 @@
+import 'package:e_commerce_store_with_bloc/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -5,9 +6,6 @@ import 'package:e_commerce_store_with_bloc/products/bloc/product_bloc.dart';
 import 'package:e_commerce_store_with_bloc/products/bloc/product_event.dart';
 import 'package:e_commerce_store_with_bloc/products/bloc/product_state.dart';
 import 'package:e_commerce_store_with_bloc/products/data/models/product_model.dart';
-import 'package:e_commerce_store_with_bloc/products/ui/product_detail_screen.dart';
-import 'package:e_commerce_store_with_bloc/cart/ui/cart_screen.dart'; // Import cart screen
-import 'package:e_commerce_store_with_bloc/user_profile/ui/user_profile_screen.dart'; // Import user profile screen
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_event.dart';
 import 'package:shimmer/shimmer.dart';
@@ -23,27 +21,31 @@ class _ProductListScreenState extends State<ProductListScreen> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<ProductBloc>(context).add(FetchProducts());
+    if (context.read<ProductBloc>().state is ProductInitial) {
+      context.read<ProductBloc>().add(FetchProducts());
+    }
   }
 
   @override
   void dispose() {
     _refreshController.dispose();
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
-  void _onRefresh() async {
-    BlocProvider.of<ProductBloc>(context).add(FetchProducts());
+  void _onRefresh() {
+    context.read<ProductBloc>().add(FetchProducts());
     _refreshController.refreshCompleted();
   }
 
   void _onSearchChanged(String query) {
-    BlocProvider.of<ProductBloc>(context).add(SearchProducts(query));
+    context.read<ProductBloc>().add(SearchProducts(query));
   }
 
   @override
@@ -56,35 +58,37 @@ class _ProductListScreenState extends State<ProductListScreen> {
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const CartScreen()),
-              );
+              _searchFocusNode.unfocus();
+              Navigator.pushNamed(context, AppRoutes.cart);
             },
           ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => const UserProfileScreen()),
-              );
+              _searchFocusNode.unfocus();
+              Navigator.pushNamed(context, AppRoutes.userProfile);
             },
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              BlocProvider.of<AuthBloc>(context).add(AuthLogoutRequested());
+              _searchFocusNode.unfocus();
+              context.read<AuthBloc>().add(AuthLogoutRequested());
+              Navigator.pushNamedAndRemoveUntil(
+                  context, AppRoutes.login, (r) => false);
             },
           ),
         ],
       ),
       body: Column(
         children: [
+          // ── Search Bar ───
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
+              focusNode: _searchFocusNode,
               decoration: InputDecoration(
                 hintText: 'Search products...',
                 prefixIcon: const Icon(Icons.search),
@@ -97,6 +101,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ),
             ),
           ),
+
+          // ── Category Chips ────
           BlocBuilder<ProductBloc, ProductState>(
             builder: (context, state) {
               if (state is ProductLoaded) {
@@ -107,8 +113,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     children: [
                       _buildCategoryChip(
                           context, 'All', state.selectedCategory),
-                      ...state.categories.map((category) => _buildCategoryChip(
-                          context, category, state.selectedCategory)),
+                      ...state.categories.map(
+                        (c) => _buildCategoryChip(
+                            context, c, state.selectedCategory),
+                      ),
                     ],
                   ),
                 );
@@ -116,11 +124,22 @@ class _ProductListScreenState extends State<ProductListScreen> {
               return const SizedBox.shrink();
             },
           ),
+
+          // ── Product Grid ─────────────────────────────────────────
           Expanded(
-            child: BlocBuilder<ProductBloc, ProductState>(
+            child: BlocConsumer<ProductBloc, ProductState>(
+              // Only fire for errors:
+              listenWhen: (previous, current) => current is ProductError,
+              listener: (context, state) {
+                if (state is ProductError && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: ${state.message}')),
+                  );
+                }
+              },
               builder: (context, state) {
                 if (state is ProductLoading) {
-                  return _buildShimmerGrid(); // Show shimmer on initial load
+                  return _buildShimmerGrid();
                 } else if (state is ProductError) {
                   return Center(child: Text('Error: ${state.message}'));
                 } else if (state is ProductLoaded) {
@@ -138,12 +157,22 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         crossAxisCount: 2,
                         crossAxisSpacing: 10.0,
                         mainAxisSpacing: 10.0,
-                        childAspectRatio: 0.75, // Adjust as needed
+                        childAspectRatio: 0.75,
                       ),
                       itemCount: state.products.length,
                       itemBuilder: (context, index) {
                         final product = state.products[index];
-                        return ProductCard(product: product);
+                        return ProductCard(
+                          product: product,
+                          onTap: () {
+                            _searchFocusNode.unfocus();
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.productDetail,
+                              arguments: {'productId': product.id},
+                            );
+                          },
+                        );
                       },
                     ),
                   );
@@ -166,14 +195,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
         label: Text(category),
         selected: isSelected,
         onSelected: (selected) {
-          if (selected) {
-            BlocProvider.of<ProductBloc>(context)
-                .add(FilterProductsByCategory(category));
-          } else {
-            // If unselected, go back to 'All' or do nothing
-            BlocProvider.of<ProductBloc>(context)
-                .add(FilterProductsByCategory('All'));
-          }
+          context.read<ProductBloc>().add(
+                FilterProductsByCategory(selected ? category : 'All'),
+              );
         },
         selectedColor: Theme.of(context).colorScheme.primary,
         labelStyle: TextStyle(
@@ -194,7 +218,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         mainAxisSpacing: 10.0,
         childAspectRatio: 0.75,
       ),
-      itemCount: 6, // Number of shimmer items
+      itemCount: 6,
       itemBuilder: (context, index) {
         return Card(
           elevation: 2,
@@ -237,19 +261,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
 class ProductCard extends StatelessWidget {
   final ProductModel product;
+  final VoidCallback onTap;
 
-  const ProductCard({Key? key, required this.product}) : super(key: key);
+  const ProductCard({Key? key, required this.product, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(productId: product.id),
-          ),
-        );
-      },
+      onTap: onTap,
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

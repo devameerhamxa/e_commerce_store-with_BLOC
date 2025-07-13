@@ -1,9 +1,11 @@
-import 'package:e_commerce_store_with_bloc/auth/ui/login_screen.dart';
-import 'package:e_commerce_store_with_bloc/cart/ui/cart_screen.dart';
-import 'package:e_commerce_store_with_bloc/products/ui/product_detail_screen.dart';
-import 'package:e_commerce_store_with_bloc/products/ui/product_list_screen.dart';
-import 'package:e_commerce_store_with_bloc/user_profile/ui/user_profile_screen.dart';
+import 'package:e_commerce_store_with_bloc/products/bloc/product_detail_bloc/product_detail_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:e_commerce_store_with_bloc/auth/ui/login_screen.dart';
+import 'package:e_commerce_store_with_bloc/user_profile/ui/user_profile_screen.dart';
+import 'package:e_commerce_store_with_bloc/products/ui/product_list_screen.dart';
+import 'package:e_commerce_store_with_bloc/products/ui/product_detail_screen.dart';
+import 'package:e_commerce_store_with_bloc/cart/ui/cart_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AppRoutes {
   // Route names
@@ -29,17 +31,36 @@ class AppRoutes {
         );
 
       case productList:
+        // ProductListScreen uses the ProductBloc provided higher up in the widget tree (MyApp)
         return MaterialPageRoute(
           builder: (context) => const ProductListScreen(),
           settings: settings,
         );
 
       case productDetail:
-        // Extract product data from arguments if needed
+        // Extract product data from arguments
         final args = settings.arguments as Map<String, dynamic>?;
+        final productId = args?['productId'];
+
+        if (productId == null) {
+          return MaterialPageRoute(
+            builder: (context) => const Scaffold(
+              body: Center(
+                child: Text('Product ID is required'),
+              ),
+            ),
+          );
+        }
+
         return MaterialPageRoute(
-          builder: (context) => ProductDetailScreen(
-            productId: args?['productId'] ?? '',
+          builder: (context) => BlocProvider.value(
+            // CORRECTED: Provide the ProductDetailBloc here
+            value: context.read<ProductDetailBloc>(),
+            child: ProductDetailScreen(
+              productId: productId is int
+                  ? productId
+                  : int.tryParse(productId.toString()) ?? 0,
+            ),
           ),
           settings: settings,
         );

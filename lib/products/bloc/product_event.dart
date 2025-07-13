@@ -27,13 +27,6 @@ class SearchProducts extends ProductEvent {
   List<Object> get props => [query];
 }
 
-class FetchProductDetails extends ProductEvent {
-  final int productId;
-
-  const FetchProductDetails(this.productId);
-
-  @override
-  List<Object> get props => [productId];
-}
-
 class FetchProductCategories extends ProductEvent {}
+
+class ClearSearchAndFilters extends ProductEvent {}

@@ -1,9 +1,11 @@
-// lib/core/app/my_app.dart
-import 'package:e_commerce_store_with_bloc/core/di/service_locator.dart';
 import 'package:e_commerce_store_with_bloc/core/theme/app_themes.dart';
-import 'package:e_commerce_store_with_bloc/core/widgets/product_list_screen_with_theme_toggle.dart';
+import 'package:e_commerce_store_with_bloc/products/bloc/product_detail_bloc/product_detail_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:e_commerce_store_with_bloc/core/di/service_locator.dart';
+import 'package:e_commerce_store_with_bloc/core/routes/app_routes.dart';
+import 'package:e_commerce_store_with_bloc/core/widgets/product_list_screen_with_theme_toggle.dart';
 
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_event.dart';
@@ -46,6 +48,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<UserBloc>(
           create: (context) => getIt<UserBloc>(),
         ),
+        BlocProvider<ProductDetailBloc>(
+          create: (context) => getIt<ProductDetailBloc>(),
+        ),
       ],
       child: MaterialApp(
         title: 'E-Commerce Store',
@@ -53,15 +58,17 @@ class _MyAppState extends State<MyApp> {
         darkTheme: AppThemes.darkTheme,
         themeMode: _themeMode,
         debugShowCheckedModeBanner: false,
+        onGenerateRoute: (settings) => AppRoutes.generateRoute(settings),
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            if (state is AuthInitial) {
+            if (state is AuthInitial || state is AuthLoading) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             } else if (state is AuthAuthenticated) {
               return ProductListScreenWithThemeToggle(
-                  onThemeToggle: _toggleTheme);
+                onThemeToggle: _toggleTheme,
+              );
             } else {
               return const LoginScreen();
             }

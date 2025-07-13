@@ -13,8 +13,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<FetchProducts>(_onFetchProducts);
     on<FilterProductsByCategory>(_onFilterProductsByCategory);
     on<SearchProducts>(_onSearchProducts);
-    on<FetchProductDetails>(_onFetchProductDetails);
+    // REMOVED: on<FetchProductDetails> - This handler now belongs to ProductDetailBloc.
     on<FetchProductCategories>(_onFetchProductCategories);
+    on<ClearSearchAndFilters>(
+        _onClearSearchAndFilters); // Handler for the new event
   }
 
   Future<void> _onFetchProducts(
@@ -79,19 +81,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  Future<void> _onFetchProductDetails(
-    FetchProductDetails event,
-    Emitter<ProductState> emit,
-  ) async {
-    emit(ProductLoading());
-    try {
-      final product =
-          await productRepository.getProductDetails(event.productId);
-      emit(ProductDetailLoaded(product: product));
-    } catch (e) {
-      emit(ProductError(message: e.toString()));
-    }
-  }
+  // REMOVED: _onFetchProductDetails handler - This now belongs to ProductDetailBloc.
 
   Future<void> _onFetchProductCategories(
     FetchProductCategories event,
@@ -106,6 +96,21 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         // If categories fail to load, don't block product display
         print('Failed to load categories: $e');
       }
+    }
+  }
+
+  // New handler to clear search and filters, if you added the event
+  void _onClearSearchAndFilters(
+    ClearSearchAndFilters event,
+    Emitter<ProductState> emit,
+  ) {
+    if (state is ProductLoaded) {
+      final currentState = state as ProductLoaded;
+      emit(currentState.copyWith(
+        products: _allProducts, // Reset to all original products
+        searchQuery: '',
+        selectedCategory: null,
+      ));
     }
   }
 }
