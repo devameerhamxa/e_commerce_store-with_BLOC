@@ -7,8 +7,7 @@ import 'package:e_commerce_store_with_bloc/products/data/repositories/product_re
 
 class CartRepository {
   final ApiClient _apiClient;
-  final ProductRepository
-      productRepository; // To fetch product details for cart items
+  final ProductRepository productRepository;
 
   CartRepository(this._apiClient, this.productRepository);
 
@@ -24,10 +23,6 @@ class CartRepository {
     }
   }
 
-  // In a real app, this would interact with a backend API to add/remove items.
-  // For FakeStoreAPI, we'll simulate a local cart for "Add to Cart" functionality
-  // and fetch a pre-existing cart from the API for "View Cart".
-  // This is a simplified local cart for demonstration.
   final Map<int, int> _localCartItems = {}; // productId -> quantity
 
   void addLocalCartItem(int productId, int quantity) {
@@ -51,7 +46,6 @@ class CartRepository {
         detailedCart[product] = entry.value;
       } catch (e) {
         print('Failed to fetch details for product ${entry.key}: $e');
-        // Optionally, handle products that couldn't be fetched (e.g., show a placeholder)
       }
     }
     return detailedCart;

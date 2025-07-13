@@ -119,9 +119,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           ),
         ],
       ),
-      drawer: AppDrawer(
-          onThemeToggle:
-              widget.onThemeToggle), // Pass the theme toggle callback
+      drawer: AppDrawer(onThemeToggle: widget.onThemeToggle),
       body: Column(
         children: [
           // ── Search Bar ───────────────────────────────────────────
@@ -206,8 +204,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         return ProductCard(
                           product: product,
                           onTap: () {
-                            _searchFocusNode
-                                .unfocus(); // Unfocus before navigating
+                            _searchFocusNode.unfocus();
                             Navigator.pushNamed(
                               context,
                               AppRoutes.productDetail,
@@ -301,8 +298,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 }
 
-// ProductCard (assuming this is in a separate file like lib/products/ui/product_card.dart)
-// No changes needed here.
 class ProductCard extends StatelessWidget {
   final ProductModel product;
   final VoidCallback onTap;

@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppThemes {
   static final ThemeData lightTheme = ThemeData(
-    // Remove explicit brightness declaration
     primaryColor: Colors.deepPurple,
     colorScheme: ColorScheme.fromSwatch(
       primarySwatch: Colors.deepPurple,
-      brightness: Brightness.light, // Explicitly set brightness here
+      brightness: Brightness.light,
     ).copyWith(
       secondary: Colors.amber,
       surface: Colors.white,

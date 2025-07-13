@@ -21,10 +21,8 @@ class AuthRepository {
       );
       final authResponse = AuthResponseModel.fromJson(response.data);
       await _secureStorage.saveAuthToken(authResponse.token);
-      // FakeStoreAPI doesn't return user ID on login, so we'll simulate a fixed one for cart/profile
-      // In a real app, the login response would include user details.
-      await _secureStorage
-          .saveUserId(1); // Assuming user ID 1 for demonstration
+
+      await _secureStorage.saveUserId(1);
       return authResponse;
     } on DioException catch (e) {
       if (e.response != null) {

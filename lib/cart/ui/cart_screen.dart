@@ -24,7 +24,6 @@ class _CartScreenState extends State<CartScreen> {
     if (authState is AuthAuthenticated) {
       BlocProvider.of<CartBloc>(context).add(FetchUserCarts(authState.userId));
     } else {
-      // Handle unauthenticated state, maybe redirect to login or show a message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please login to view your cart.')),
       );
@@ -121,7 +120,6 @@ class _CartScreenState extends State<CartScreen> {
                 const SnackBar(
                     content: Text('Proceeding to Checkout (Not implemented)')),
               );
-              // Implement checkout logic here
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 15),

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_bloc.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_event.dart';
-import 'package:e_commerce_store_with_bloc/core/widgets/custom_loading_indicator.dart'; // Ensure this import is correct
+import 'package:e_commerce_store_with_bloc/core/widgets/custom_loading_indicator.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
@@ -21,8 +21,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Dispatch the event to the NEW ProductDetailBloc
-    // Use addPostFrameCallback for safety with context.read in initState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context
           .read<ProductDetailBloc>()
@@ -37,7 +35,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         title: const Text('Product Details'),
         centerTitle: true,
       ),
-      // Use the NEW Bloc in the listener and builder
       body: BlocConsumer<ProductDetailBloc, ProductDetailState>(
         listener: (context, state) {
           if (state is ProductDetailError) {
@@ -57,7 +54,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    // Removed CustomLoadingIndicator shimmer here as Image.network handles its own loading.
                     child: Image.network(
                       product.image,
                       height: 250,
@@ -69,12 +65,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ImageChunkEvent? loadingProgress) {
                         if (loadingProgress == null) return child;
                         return CustomLoadingIndicator(
-                          // Use CustomLoadingIndicator for image loading shimmer
                           isLoading: true,
                           child: Container(
                             height: 250,
                             width: double.infinity,
-                            color: Colors.grey[300], // Placeholder color
+                            color: Colors.grey[300],
                           ),
                         );
                       },
@@ -131,7 +126,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     height: 50,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Assuming CartBloc is available via BlocProvider
                         BlocProvider.of<CartBloc>(context).add(
                           AddToCart(productId: product.id, quantity: 1),
                         );
@@ -155,7 +149,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             );
           } else if (state is ProductDetailError) {
-            // Changed to ProductDetailError
             return Center(child: Text('Error: ${state.message}'));
           }
 

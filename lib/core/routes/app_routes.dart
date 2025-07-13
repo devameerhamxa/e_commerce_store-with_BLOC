@@ -31,7 +31,6 @@ class AppRoutes {
         );
 
       case productList:
-        // ProductListScreen uses the ProductBloc provided higher up in the widget tree (MyApp)
         return MaterialPageRoute(
           builder: (context) => ProductListScreen(
             onThemeToggle: (bool isDarkMode) {},
@@ -40,7 +39,6 @@ class AppRoutes {
         );
 
       case productDetail:
-        // Extract product data from arguments
         final args = settings.arguments as Map<String, dynamic>?;
         final productId = args?['productId'];
 
@@ -56,7 +54,6 @@ class AppRoutes {
 
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
-            // CORRECTED: Provide the ProductDetailBloc here
             value: context.read<ProductDetailBloc>(),
             child: ProductDetailScreen(
               productId: productId is int

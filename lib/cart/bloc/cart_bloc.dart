@@ -20,28 +20,21 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   ) async {
     emit(CartLoading());
     try {
-      // For FakeStoreAPI, we'll fetch a sample cart from the API
-      // and also incorporate locally added items.
-      // In a real app, you'd likely fetch the full server-side cart.
       final apiCarts = await cartRepository.getUserCarts(event.userId);
       final Map<int, int> combinedCartProductIds = {};
 
-      // Add API cart items
       if (apiCarts.isNotEmpty) {
-        // Just taking the first cart for simplicity
         for (var item in apiCarts.first.products) {
           combinedCartProductIds[item.productId] =
               (combinedCartProductIds[item.productId] ?? 0) + item.quantity;
         }
       }
 
-      // Add local cart items (simulated "Add to Cart")
       cartRepository.getLocalCartItems().forEach((productId, quantity) {
         combinedCartProductIds[productId] =
             (combinedCartProductIds[productId] ?? 0) + quantity;
       });
 
-      // Now fetch detailed product info for all combined items
       final Map<ProductModel, int> detailedCart = {};
       double total = 0.0;
 
@@ -84,14 +77,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             cartItems: updatedCartItems, cartTotal: newTotal));
       } catch (e) {
         print('Error adding to cart locally: $e');
-        // Fallback to full refresh if product details can't be fetched
-        // This would ideally trigger a FetchUserCarts event with the current user ID
       }
-    } else {
-      // If not CartLoaded, we need a user ID to fetch the full cart.
-      // This scenario implies the cart was not loaded initially or an error occurred.
-      // For simplicity, we'll just add locally and assume a refresh will happen later.
-    }
+    } else {}
   }
 
   Future<void> _onRemoveFromCart(

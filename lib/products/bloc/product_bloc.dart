@@ -13,10 +13,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<FetchProducts>(_onFetchProducts);
     on<FilterProductsByCategory>(_onFilterProductsByCategory);
     on<SearchProducts>(_onSearchProducts);
-    // REMOVED: on<FetchProductDetails> - This handler now belongs to ProductDetailBloc.
+
     on<FetchProductCategories>(_onFetchProductCategories);
-    on<ClearSearchAndFilters>(
-        _onClearSearchAndFilters); // Handler for the new event
+    on<ClearSearchAndFilters>(_onClearSearchAndFilters);
   }
 
   Future<void> _onFetchProducts(

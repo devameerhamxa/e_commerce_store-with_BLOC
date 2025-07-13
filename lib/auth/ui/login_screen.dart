@@ -142,7 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 20),
                   TextButton(
                     onPressed: () {
-                      // Handle forgot password or sign up navigation
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Forgot Password? Or Sign Up?')),
