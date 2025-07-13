@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:e_commerce_store_with_bloc/common/constants/app_constants.dart';
-import 'package:e_commerce_store_with_bloc/common/utils/secure_storage.dart';
+import 'package:e_commerce_store_with_bloc/core/constants/app_constants.dart';
+import 'package:e_commerce_store_with_bloc/core/utils/secure_storage.dart';
 
 class ApiClient {
   late Dio _dio;

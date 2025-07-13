@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:e_commerce_store_with_bloc/api/api_client.dart';
+import 'package:e_commerce_store_with_bloc/core/api/api_client.dart';
 import 'package:e_commerce_store_with_bloc/auth/data/models/auth_response_model.dart';
-import 'package:e_commerce_store_with_bloc/common/constants/app_constants.dart';
-import 'package:e_commerce_store_with_bloc/common/utils/secure_storage.dart';
+import 'package:e_commerce_store_with_bloc/core/constants/app_constants.dart';
+import 'package:e_commerce_store_with_bloc/core/utils/secure_storage.dart';
 
 class AuthRepository {
   final ApiClient _apiClient;

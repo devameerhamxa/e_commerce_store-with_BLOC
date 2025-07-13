@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:e_commerce_store_with_bloc/api/api_client.dart';
+import 'package:e_commerce_store_with_bloc/core/api/api_client.dart';
 import 'package:e_commerce_store_with_bloc/cart/data/models/cart_model.dart';
-import 'package:e_commerce_store_with_bloc/common/constants/app_constants.dart';
+import 'package:e_commerce_store_with_bloc/core/constants/app_constants.dart';
 import 'package:e_commerce_store_with_bloc/products/data/models/product_model.dart';
 import 'package:e_commerce_store_with_bloc/products/data/repositories/product_repository.dart';
 

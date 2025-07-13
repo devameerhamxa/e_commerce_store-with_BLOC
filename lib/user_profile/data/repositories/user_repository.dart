@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:e_commerce_store_with_bloc/api/api_client.dart';
-import 'package:e_commerce_store_with_bloc/common/constants/app_constants.dart';
+import 'package:e_commerce_store_with_bloc/core/api/api_client.dart';
+import 'package:e_commerce_store_with_bloc/core/constants/app_constants.dart';
 import 'package:e_commerce_store_with_bloc/user_profile/data/models/user_model.dart';
 
 class UserRepository {

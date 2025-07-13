@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_event.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_state.dart';
-import 'package:e_commerce_store_with_bloc/products/ui/product_list_screen.dart'; // Import product list screen
+import 'package:e_commerce_store_with_bloc/products/ui/product_list_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -13,8 +13,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController =
+      TextEditingController(text: "mor_2314");
+  final TextEditingController _passwordController =
+      TextEditingController(text: "83r5^_");
   final _formKey = GlobalKey<FormState>();
 
   @override

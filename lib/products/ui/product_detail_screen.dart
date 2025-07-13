@@ -5,7 +5,7 @@ import 'package:e_commerce_store_with_bloc/products/bloc/product_event.dart';
 import 'package:e_commerce_store_with_bloc/products/bloc/product_state.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_bloc.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_event.dart';
-import 'package:e_commerce_store_with_bloc/common/widgets/custom_loading_indicator.dart';
+import 'package:e_commerce_store_with_bloc/core/widgets/custom_loading_indicator.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
