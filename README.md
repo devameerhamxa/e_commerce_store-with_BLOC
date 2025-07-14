@@ -123,3 +123,7 @@ flutter build apk --release
 Here`s the APK--release link & video:
 APK: https://drive.google.com/file/d/1G5JCwdkFxL5XlOxCHhbZ49ce8VfK3iFz/view?usp=sharing
 Screen Recording Video: https://drive.google.com/file/d/17rhJnwANQhZuqSjMIpD__cD4OrluP_kQ/view?usp=sharing
+
+Login Credentials:
+username: mor_2314
+password: 83r5^_
