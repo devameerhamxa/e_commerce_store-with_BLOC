@@ -1,7 +1,3 @@
-Here's a **more concise and formal version** of your project README for **"E-Commerce Store with BLoC"**:
-
----
-
 # 🛍️ E-Commerce Store with BLoC
 
 A mini e-commerce Flutter application built with a clean architecture (MVVM), leveraging BLoC for state management and integrating with [FakeStoreAPI](https://fakestoreapi.com/).
@@ -124,5 +120,6 @@ flutter build apk --release
 * No animations or localization
 
 ---
-
-Let me know if you'd like a markdown file version or want to include GitHub badges, screenshots, or contribution guidelines.
+Here`s the APK--release link & video:
+APK: https://drive.google.com/file/d/1G5JCwdkFxL5XlOxCHhbZ49ce8VfK3iFz/view?usp=sharing
+Screen Recording Video: https://drive.google.com/file/d/17rhJnwANQhZuqSjMIpD__cD4OrluP_kQ/view?usp=sharing
