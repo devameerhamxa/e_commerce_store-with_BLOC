@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:e_commerce_store_with_bloc/core/constants/app_constants.dart';
 import 'package:e_commerce_store_with_bloc/core/utils/secure_storage.dart';
@@ -27,22 +29,20 @@ class ApiClient {
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-          print('REQUEST[${options.method}] => PATH: ${options.path}');
-          print('HEADERS: ${options.headers}');
-          print('DATA: ${options.data}');
+          log('REQUEST[${options.method}] => PATH: ${options.path}');
+          log('HEADERS: ${options.headers}');
+          log('DATA: ${options.data}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          print(
-              'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
-          print('DATA: ${response.data}');
+          log('RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
+          log('DATA: ${response.data}');
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          print(
-              'ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
-          print('ERROR MESSAGE: ${e.message}');
-          print('ERROR RESPONSE: ${e.response?.data}');
+          log('ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
+          log('ERROR MESSAGE: ${e.message}');
+          log('ERROR RESPONSE: ${e.response?.data}');
           return handler.next(e);
         },
       ),

@@ -14,9 +14,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController =
-      TextEditingController(text: "mor_2314");
+      TextEditingController(text: ""); //mor_2314
   final TextEditingController _passwordController =
-      TextEditingController(text: "83r5^_");
+      TextEditingController(text: ""); //83r5^_
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Login Failed: ${state.message}')),
+              SnackBar(content: Text('Login Failed: Please try again')),
             );
           }
         },
@@ -129,8 +129,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           child: state is AuthLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white)
+                              ? Center(
+                                  child: const CircularProgressIndicator(
+                                      color: Colors.white),
+                                )
                               : const Text(
                                   'Login',
                                   style: TextStyle(fontSize: 18),

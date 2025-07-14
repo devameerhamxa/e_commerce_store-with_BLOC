@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:e_commerce_store_with_bloc/core/api/api_client.dart';
 import 'package:e_commerce_store_with_bloc/cart/data/models/cart_model.dart';
@@ -45,7 +47,7 @@ class CartRepository {
         final product = await productRepository.getProductDetails(entry.key);
         detailedCart[product] = entry.value;
       } catch (e) {
-        print('Failed to fetch details for product ${entry.key}: $e');
+        log('Failed to fetch details for product ${entry.key}: $e');
       }
     }
     return detailedCart;

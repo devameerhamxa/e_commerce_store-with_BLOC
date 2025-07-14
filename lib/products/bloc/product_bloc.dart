@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_store_with_bloc/products/bloc/product_event.dart';
 import 'package:e_commerce_store_with_bloc/products/bloc/product_state.dart';
@@ -38,7 +40,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ) async {
     if (state is ProductLoaded) {
       final currentState = state as ProductLoaded;
-      emit(ProductLoading()); // Show loading while filtering
+      emit(ProductLoading());
       try {
         List<ProductModel> filteredProducts;
         if (event.category == 'All') {
@@ -50,7 +52,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(currentState.copyWith(
           products: filteredProducts,
           selectedCategory: event.category,
-          searchQuery: '', // Clear search when filtering by category
+          searchQuery: '',
         ));
       } catch (e) {
         emit(ProductError(message: e.toString()));
@@ -75,12 +77,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(currentState.copyWith(
         products: filteredProducts,
         searchQuery: event.query,
-        selectedCategory: null, // Clear category selection when searching
+        selectedCategory: null,
       ));
     }
   }
-
-  // REMOVED: _onFetchProductDetails handler - This now belongs to ProductDetailBloc.
 
   Future<void> _onFetchProductCategories(
     FetchProductCategories event,
@@ -92,13 +92,11 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         _allCategories = await productRepository.getCategories();
         emit(currentState.copyWith(categories: _allCategories));
       } catch (e) {
-        // If categories fail to load, don't block product display
-        print('Failed to load categories: $e');
+        log('Failed to load categories: $e');
       }
     }
   }
 
-  // New handler to clear search and filters, if you added the event
   void _onClearSearchAndFilters(
     ClearSearchAndFilters event,
     Emitter<ProductState> emit,
@@ -106,7 +104,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     if (state is ProductLoaded) {
       final currentState = state as ProductLoaded;
       emit(currentState.copyWith(
-        products: _allProducts, // Reset to all original products
+        products: _allProducts,
         searchQuery: '',
         selectedCategory: null,
       ));

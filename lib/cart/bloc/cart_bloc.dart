@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_event.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_state.dart';
@@ -45,8 +47,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           detailedCart[product] = entry.value;
           total += product.price * entry.value;
         } catch (e) {
-          print(
-              'Error fetching product details for cart item ${entry.key}: $e');
+          log('Error fetching product details for cart item ${entry.key}: $e');
         }
       }
 
@@ -76,7 +77,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         emit(currentState.copyWith(
             cartItems: updatedCartItems, cartTotal: newTotal));
       } catch (e) {
-        print('Error adding to cart locally: $e');
+        log('Error adding to cart locally: $e');
       }
     } else {}
   }

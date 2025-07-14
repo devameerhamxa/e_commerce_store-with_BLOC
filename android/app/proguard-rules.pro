@@ -1,0 +1,8 @@
+-keep class com.yourapp.** { *; }
+-keep class retrofit2.** { *; }
+-keep class okhttp3.** { *; }
+-keep class com.google.gson.** { *; }
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**
+-dontwarn okio.**
+-dontwarn javax.annotation.Nullable

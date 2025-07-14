@@ -15,15 +15,15 @@ class ProductListScreenWithThemeToggle extends StatelessWidget {
       body: Stack(
         children: [
           ProductListScreen(onThemeToggle: onThemeToggle),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: Icon(
-              Theme.of(context).brightness == Brightness.light
-                  ? Icons.dark_mode
-                  : Icons.light_mode,
-            ),
-          ),
+          // Positioned(
+          //   bottom: 20,
+          //   right: 20,
+          //   child: Icon(
+          //     Theme.of(context).brightness == Brightness.light
+          //         ? Icons.dark_mode
+          //         : Icons.light_mode,
+          //   ),
+          // ),
         ],
       ),
     );
