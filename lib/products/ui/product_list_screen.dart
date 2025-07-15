@@ -1,3 +1,6 @@
+import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
+import 'package:e_commerce_store_with_bloc/auth/bloc/auth_state.dart';
+import 'package:e_commerce_store_with_bloc/cart/bloc/cart_event.dart';
 import 'package:e_commerce_store_with_bloc/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,8 +33,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
   @override
   void initState() {
     super.initState();
-    if (context.read<ProductBloc>().state is ProductInitial) {
-      context.read<ProductBloc>().add(FetchProducts());
+    context.read<ProductBloc>().add(FetchProducts());
+
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      context.read<CartBloc>().add(FetchUserCarts(authState.userId));
     }
   }
 

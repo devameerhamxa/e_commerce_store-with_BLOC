@@ -40,6 +40,11 @@ class CartRepository {
     return Map.from(_localCartItems);
   }
 
+  void clearLocalCart() {
+    _localCartItems.clear();
+    log('[Cart Repo]: Local cart cleared. Current items: $_localCartItems');
+  }
+
   Future<Map<ProductModel, int>> getDetailedLocalCart() async {
     final Map<ProductModel, int> detailedCart = {};
     for (final entry in _localCartItems.entries) {

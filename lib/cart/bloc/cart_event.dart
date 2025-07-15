@@ -45,3 +45,7 @@ class UpdateCartItemQuantity extends CartEvent {
   @override
   List<Object> get props => [productId, quantity];
 }
+
+class ResetCartState extends CartEvent {
+  const ResetCartState();
+}

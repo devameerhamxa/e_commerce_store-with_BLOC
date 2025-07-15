@@ -20,11 +20,11 @@ import 'package:e_commerce_store_with_bloc/user_profile/data/repositories/user_r
 final GetIt getIt = GetIt.instance;
 
 void setupLocator() {
-  // Register singletons
+  // Register singletons for core services
   getIt.registerLazySingleton<SecureStorage>(() => SecureStorage());
   getIt.registerLazySingleton<ApiClient>(() => ApiClient());
 
-  // Register repositories
+  // Register repositories as lazy singletons
   getIt.registerLazySingleton<AuthRepository>(
       () => AuthRepository(getIt<ApiClient>(), getIt<SecureStorage>()));
   getIt.registerLazySingleton<ProductRepository>(
@@ -34,16 +34,16 @@ void setupLocator() {
   getIt.registerLazySingleton<UserRepository>(
       () => UserRepository(getIt<ApiClient>()));
 
-  // Register BLoCs
-  getIt.registerFactory<AuthBloc>(
-      () => AuthBloc(authRepository: getIt<AuthRepository>()));
-  getIt.registerFactory<ProductBloc>(
+  // Register BLoCs as lazy singletons to maintain state across screens
+  getIt.registerLazySingleton<AuthBloc>(() => AuthBloc(
+      authRepository: getIt<AuthRepository>(),
+      cartRepository: getIt<CartRepository>()));
+  getIt.registerLazySingleton<ProductBloc>(
       () => ProductBloc(productRepository: getIt<ProductRepository>()));
-  getIt.registerFactory<CartBloc>(
+  getIt.registerLazySingleton<CartBloc>(
       () => CartBloc(cartRepository: getIt<CartRepository>()));
-  getIt.registerFactory<UserBloc>(
+  getIt.registerLazySingleton<UserBloc>(
       () => UserBloc(userRepository: getIt<UserRepository>()));
-
   getIt.registerLazySingleton<ProductDetailBloc>(
       () => ProductDetailBloc(productRepository: getIt<ProductRepository>()));
 }

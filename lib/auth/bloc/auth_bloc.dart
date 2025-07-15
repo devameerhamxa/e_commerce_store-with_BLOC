@@ -1,3 +1,4 @@
+import 'package:e_commerce_store_with_bloc/cart/data/repositories/cart_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_event.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_state.dart';
@@ -5,8 +6,10 @@ import 'package:e_commerce_store_with_bloc/auth/data/repositories/auth_repositor
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
+  final CartRepository cartRepository;
 
-  AuthBloc({required this.authRepository}) : super(AuthInitial()) {
+  AuthBloc({required this.authRepository, required this.cartRepository})
+      : super(AuthInitial()) {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthCheckStatus>(_onCheckStatus);
@@ -36,6 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     await authRepository.logout();
+    cartRepository.clearLocalCart();
     emit(AuthUnauthenticated());
   }
 
@@ -49,6 +53,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final token = await authRepository.getAuthToken();
         final userId = await authRepository.getLoggedInUserId();
         if (token != null && userId != null) {
+          cartRepository.clearLocalCart();
           emit(AuthAuthenticated(token: token, userId: userId));
         } else {
           emit(AuthUnauthenticated());

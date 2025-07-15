@@ -14,6 +14,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<AddToCart>(_onAddToCart);
     on<RemoveFromCart>(_onRemoveFromCart);
     on<UpdateCartItemQuantity>(_onUpdateCartItemQuantity);
+    on<ResetCartState>((event, emit) {
+      emit(CartInitial());
+    });
   }
 
   Future<void> _onFetchUserCarts(
@@ -32,10 +35,14 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         }
       }
 
-      cartRepository.getLocalCartItems().forEach((productId, quantity) {
+      final localItems = cartRepository.getLocalCartItems();
+
+      localItems.forEach((productId, quantity) {
         combinedCartProductIds[productId] =
             (combinedCartProductIds[productId] ?? 0) + quantity;
       });
+
+      cartRepository.clearLocalCart();
 
       final Map<ProductModel, int> detailedCart = {};
       double total = 0.0;
