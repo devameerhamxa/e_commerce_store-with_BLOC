@@ -2,6 +2,7 @@ import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_state.dart';
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_event.dart';
 import 'package:e_commerce_store_with_bloc/core/routes/app_routes.dart';
+import 'package:e_commerce_store_with_bloc/core/widgets/animated_product_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -15,9 +16,7 @@ import 'package:e_commerce_store_with_bloc/core/widgets/app_drawer.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductListScreen extends StatefulWidget {
-  const ProductListScreen({
-    Key? key,
-  }) : super(key: key);
+  const ProductListScreen({Key? key}) : super(key: key);
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
@@ -32,6 +31,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   @override
   void initState() {
     super.initState();
+    // Fetch products when the screen initializes
     context.read<ProductBloc>().add(FetchProducts());
 
     final authState = context.read<AuthBloc>().state;
@@ -124,7 +124,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           ),
         ],
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           // ── Search Bar ───────────────────────────────────────────
@@ -165,6 +165,24 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ],
                   ),
                 );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+
+          // ── Animated Product Carousel ───────────────────────────
+          BlocBuilder<ProductBloc, ProductState>(
+            // Only rebuild this section when ProductLoaded state changes
+            buildWhen: (previous, current) => current is ProductLoaded,
+            builder: (context, state) {
+              if (state is ProductLoaded && state.products.isNotEmpty) {
+                final carouselProducts = state.products.take(8).toList();
+                if (carouselProducts.isNotEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: AnimatedProductCarousel(products: carouselProducts),
+                  );
+                }
               }
               return const SizedBox.shrink();
             },
