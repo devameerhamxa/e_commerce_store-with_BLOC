@@ -32,9 +32,7 @@ class AppRoutes {
 
       case productList:
         return MaterialPageRoute(
-          builder: (context) => ProductListScreen(
-            onThemeToggle: (bool isDarkMode) {},
-          ),
+          builder: (context) => ProductListScreen(),
           settings: settings,
         );
 

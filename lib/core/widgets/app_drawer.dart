@@ -1,16 +1,14 @@
 import 'package:e_commerce_store_with_bloc/core/routes/app_routes.dart';
+import 'package:e_commerce_store_with_bloc/core/theme/theme_bloc/theme_bloc.dart';
+import 'package:e_commerce_store_with_bloc/core/theme/theme_bloc/theme_event.dart';
+import 'package:e_commerce_store_with_bloc/core/theme/theme_bloc/theme_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_bloc.dart';
 import 'package:e_commerce_store_with_bloc/auth/bloc/auth_event.dart';
 
 class AppDrawer extends StatelessWidget {
-  final Function(bool) onThemeToggle;
-
-  const AppDrawer({
-    Key? key,
-    required this.onThemeToggle,
-  }) : super(key: key);
+  const AppDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -51,20 +49,26 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, AppRoutes.userProfile);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.brightness_6),
-            title: const Text('Toggle Theme'),
-            trailing: Switch(
-              value: Theme.of(context).brightness == Brightness.dark,
-              onChanged: (bool value) {
-                onThemeToggle(value);
-              },
-              activeColor: Theme.of(context).colorScheme.primary,
-              inactiveThumbColor: Colors.grey,
-              inactiveTrackColor: Colors.grey[300],
-            ),
-            onTap: () {
-              onThemeToggle(Theme.of(context).brightness == Brightness.light);
+          BlocBuilder<ThemeBloc, ThemeState>(
+            builder: (context, themeState) {
+              final isDarkMode = themeState.themeMode == ThemeMode.dark;
+              return ListTile(
+                leading: const Icon(Icons.brightness_6),
+                title: const Text('Toggle Theme'),
+                trailing: Switch(
+                  value: isDarkMode,
+                  onChanged: (bool value) {
+                    context.read<ThemeBloc>().add(ToggleTheme(value));
+                  },
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  inactiveThumbColor: Colors.grey,
+                  inactiveTrackColor: Colors.grey[300],
+                ),
+                onTap: () {
+                  // Tapping the list tile also toggles the switch
+                  context.read<ThemeBloc>().add(ToggleTheme(!isDarkMode));
+                },
+              );
             },
           ),
           ListTile(

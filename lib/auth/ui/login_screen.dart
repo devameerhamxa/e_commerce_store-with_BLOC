@@ -52,10 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
 
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (context) => ProductListScreen(
-                        onThemeToggle: (bool isDarkMode) {},
-                      )),
+              MaterialPageRoute(builder: (context) => ProductListScreen()),
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(

@@ -15,10 +15,9 @@ import 'package:e_commerce_store_with_bloc/core/widgets/app_drawer.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductListScreen extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-
-  const ProductListScreen({Key? key, required this.onThemeToggle})
-      : super(key: key);
+  const ProductListScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
@@ -125,7 +124,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           ),
         ],
       ),
-      drawer: AppDrawer(onThemeToggle: widget.onThemeToggle),
+      drawer: AppDrawer(),
       body: Column(
         children: [
           // ── Search Bar ───────────────────────────────────────────

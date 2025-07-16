@@ -1,5 +1,8 @@
 import 'package:e_commerce_store_with_bloc/cart/bloc/cart_event.dart';
 import 'package:e_commerce_store_with_bloc/core/theme/app_themes.dart';
+import 'package:e_commerce_store_with_bloc/core/theme/theme_bloc/theme_bloc.dart';
+import 'package:e_commerce_store_with_bloc/core/theme/theme_bloc/theme_state.dart';
+
 import 'package:e_commerce_store_with_bloc/products/bloc/product_detail_bloc/product_detail_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,14 +28,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeMode.system;
-
-  void _toggleTheme(bool isDarkMode) {
-    setState(() {
-      _themeMode = isDarkMode ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -52,46 +47,51 @@ class _MyAppState extends State<MyApp> {
           BlocProvider<ProductDetailBloc>(
             create: (context) => getIt<ProductDetailBloc>(),
           ),
+          BlocProvider<ThemeBloc>(
+            create: (context) => getIt<ThemeBloc>(),
+          ),
         ],
-        child: MaterialApp(
-          title: 'E-Commerce Store',
-          theme: AppThemes.lightTheme,
-          darkTheme: AppThemes.darkTheme,
-          themeMode: _themeMode,
-          debugShowCheckedModeBanner: false,
-          onGenerateRoute: (settings) => AppRoutes.generateRoute(settings),
-          home: MultiBlocListener(
-            listeners: [
-              BlocListener<AuthBloc, AuthState>(
-                listener: (context, state) {
-                  if (state is AuthAuthenticated) {
-                    // Fetch fresh cart data on login
-                    BlocProvider.of<CartBloc>(context)
-                        .add(FetchUserCarts(state.userId));
-                  } else if (state is AuthUnauthenticated) {
-                    // Reset cart state immediately on logout
-                    BlocProvider.of<CartBloc>(context)
-                        .add(const ResetCartState());
+        child: BlocBuilder<ThemeBloc, ThemeState>(
+            // NEW: Use BlocBuilder for ThemeBloc
+            builder: (context, themeState) {
+          return MaterialApp(
+            title: 'E-Commerce Store',
+            theme: AppThemes.lightTheme,
+            darkTheme: AppThemes.darkTheme,
+            themeMode: themeState.themeMode,
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: (settings) => AppRoutes.generateRoute(settings),
+            home: MultiBlocListener(
+              listeners: [
+                BlocListener<AuthBloc, AuthState>(
+                  listener: (context, state) {
+                    if (state is AuthAuthenticated) {
+                      // Fetch fresh cart data on login
+                      BlocProvider.of<CartBloc>(context)
+                          .add(FetchUserCarts(state.userId));
+                    } else if (state is AuthUnauthenticated) {
+                      // Reset cart state immediately on logout
+                      BlocProvider.of<CartBloc>(context)
+                          .add(const ResetCartState());
+                    }
+                  },
+                ),
+              ],
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthInitial || state is AuthLoading) {
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  } else if (state is AuthAuthenticated) {
+                    return ProductListScreenWithThemeToggle();
+                  } else {
+                    return const LoginScreen();
                   }
                 },
               ),
-            ],
-            child: BlocBuilder<AuthBloc, AuthState>(
-              builder: (context, state) {
-                if (state is AuthInitial || state is AuthLoading) {
-                  return const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
-                  );
-                } else if (state is AuthAuthenticated) {
-                  return ProductListScreenWithThemeToggle(
-                    onThemeToggle: _toggleTheme,
-                  );
-                } else {
-                  return const LoginScreen();
-                }
-              },
             ),
-          ),
-        ));
+          );
+        }));
   }
 }
