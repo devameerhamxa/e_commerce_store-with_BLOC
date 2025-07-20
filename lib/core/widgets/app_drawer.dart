@@ -51,23 +51,44 @@ class AppDrawer extends StatelessWidget {
           ),
           BlocBuilder<ThemeBloc, ThemeState>(
             builder: (context, themeState) {
-              final isDarkMode = themeState.themeMode == ThemeMode.dark;
+              // Helper to get the display name for the current theme mode
+              String getThemeModeDisplayName(ThemeMode mode) {
+                switch (mode) {
+                  case ThemeMode.system:
+                    return 'System';
+                  case ThemeMode.light:
+                    return 'Light';
+                  case ThemeMode.dark:
+                    return 'Dark';
+                }
+              }
+
               return ListTile(
                 leading: const Icon(Icons.brightness_6),
-                title: const Text('Toggle Theme'),
-                trailing: Switch(
-                  value: isDarkMode,
-                  onChanged: (bool value) {
-                    context.read<ThemeBloc>().add(ToggleTheme(value));
+                title: const Text('Theme Mode'),
+                subtitle: Text(getThemeModeDisplayName(themeState.themeMode)),
+                trailing: PopupMenuButton<ThemeMode>(
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  onSelected: (ThemeMode selectedMode) {
+                    context.read<ThemeBloc>().add(ToggleTheme(selectedMode));
                   },
-                  activeColor: Theme.of(context).colorScheme.primary,
-                  inactiveThumbColor: Colors.grey,
-                  inactiveTrackColor: Colors.grey[300],
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<ThemeMode>>[
+                    PopupMenuItem<ThemeMode>(
+                      value: ThemeMode.system,
+                      child: Text('System'),
+                    ),
+                    PopupMenuItem<ThemeMode>(
+                      value: ThemeMode.light,
+                      child: Text('Light'),
+                    ),
+                    PopupMenuItem<ThemeMode>(
+                      value: ThemeMode.dark,
+                      child: Text('Dark'),
+                    ),
+                  ],
                 ),
-                onTap: () {
-                  // Tapping the list tile also toggles the switch
-                  context.read<ThemeBloc>().add(ToggleTheme(!isDarkMode));
-                },
+                onTap: () {},
               );
             },
           ),

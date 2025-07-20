@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 abstract class ThemeEvent extends Equatable {
   const ThemeEvent();
@@ -8,9 +9,9 @@ abstract class ThemeEvent extends Equatable {
 }
 
 class ToggleTheme extends ThemeEvent {
-  final bool isDarkMode; // true for dark, false for light
-  const ToggleTheme(this.isDarkMode);
+  final ThemeMode themeMode;
+  const ToggleTheme(this.themeMode);
 
   @override
-  List<Object> get props => [isDarkMode];
+  List<Object> get props => [themeMode];
 }

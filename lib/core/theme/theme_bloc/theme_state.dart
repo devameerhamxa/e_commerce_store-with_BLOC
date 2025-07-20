@@ -10,7 +10,7 @@ abstract class ThemeState extends Equatable {
 }
 
 class ThemeInitial extends ThemeState {
-  // Default to system theme, or specify a default like ThemeMode.light
+  // Default to system theme on app start
   const ThemeInitial() : super(ThemeMode.system);
 }
 
