@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'package:e_commerce_store_with_bloc/core/routes/app_routes.dart';
 import 'package:e_commerce_store_with_bloc/products/ui/product_list_screen.dart';
@@ -62,6 +64,7 @@ class _AnimatedProductCarouselState extends State<AnimatedProductCarousel> {
 
     return Column(
       children: [
+        
         SizedBox(
           height: 220,
           child: PageView.builder(
@@ -108,20 +111,20 @@ class _AnimatedProductCarouselState extends State<AnimatedProductCarousel> {
             },
           ),
         ),
-        const SizedBox(height: 6), // Spacing between carousel and dots
+        const SizedBox(height: 6), 
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(widget.products.length, (index) {
             return AnimatedContainer(
               duration: const Duration(
-                  milliseconds: 300), // Animation for dot size/color
+                  milliseconds: 300), 
               margin: const EdgeInsets.symmetric(horizontal: 4.0),
               height: 8.0,
-              width: _currentPage == index ? 24.0 : 8.0, // Active dot is wider
+              width: _currentPage == index ? 24.0 : 8.0,
               decoration: BoxDecoration(
                 color: _currentPage == index
-                    ? Theme.of(context).colorScheme.primary // Active dot color
-                    : Colors.grey.withOpacity(0.5), // Inactive dot color
+                    ? Theme.of(context).colorScheme.primary 
+                    : Colors.grey.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(4.0),
               ),
             );
